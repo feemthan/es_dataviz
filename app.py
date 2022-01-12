@@ -17,7 +17,6 @@ def health_check():
 
 @app.route('/loader', methods=["GET"])
 def loader():
-    # es = Elasticsearch(hosts=[{"host": "host.docker.internal", "port": 9200}])
 
     es = Elasticsearch([os.getenv('ES_HOST')], port= 9200)
     with open('Iris.csv') as f:
@@ -27,7 +26,6 @@ def loader():
 
 @app.route('/viewer', methods=["GET"])
 def viewer():
-    # es = Elasticsearch(hosts=[{"host": "host.docker.internal", "port": 9200}])
 
     es = Elasticsearch([os.getenv('ES_HOST')], port= 9200)
     res = es.search(index="iris", doc_type="flowers", size=1000)
