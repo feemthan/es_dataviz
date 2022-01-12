@@ -21,16 +21,16 @@ services:
     ports:
       - 9200:9200
       - 9300:9300
-  app:
-    build:
-        context: .
-        args:
-            - NODE_ENV=local
-        dockerfile: Dockerfile
-    ports:
-        - "8010:8010"
-    depends_on:
-      - elasticsearch
+  # app:
+  #   build:
+  #       context: .
+  #       args:
+  #           - NODE_ENV=local
+  #       dockerfile: Dockerfile
+  #   ports:
+  #       - "8010:8010"
+  #   depends_on:
+  #     - elasticsearch
 
 volumes:
   elasticsearch-data:
