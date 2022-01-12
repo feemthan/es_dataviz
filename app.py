@@ -17,15 +17,19 @@ def health_check():
 
 @app.route('/loader', methods=["GET"])
 def loader():
-    es = Elasticsearch([os.getenv('ES_HOST')])
+    # es = Elasticsearch(hosts=[{"host": "host.docker.internal", "port": 9200}])
+
+    es = Elasticsearch([os.getenv('ES_HOST')], port= 9200)
     with open('Iris.csv') as f:
         reader = csv.DictReader(f)
         helpers.bulk(es, reader, index='iris', doc_type='flowers')
-    return jsonify(status='ok'), 200
+    return jsonify(status='DATASET LOADED'), 200
 
 @app.route('/viewer', methods=["GET"])
 def viewer():
-    es = Elasticsearch([os.getenv('ES_HOST')])
+    # es = Elasticsearch(hosts=[{"host": "host.docker.internal", "port": 9200}])
+
+    es = Elasticsearch([os.getenv('ES_HOST')], port= 9200)
     res = es.search(index="iris", doc_type="flowers", size=1000)
 
     df = pd.json_normalize(res['hits']['hits'])
@@ -40,7 +44,7 @@ def viewer():
 
     g = sns.pairplot(df,hue="Species")
     plt.show()
-    return jsonify(status='ok'), 200
+    return jsonify(status='VIEWER WORKS'), 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8010, debug=True)

@@ -3,7 +3,7 @@ version: '3.7'
 services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
-    container_name: elasticsearchv1
+    # container_name: elasticsearch
     networks:
       - dataviz
     environment:
@@ -41,3 +41,4 @@ volumes:
     driver: local
 networks:
   dataviz:
+    driver: bridge
