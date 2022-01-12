@@ -5,7 +5,7 @@ import json
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+import os
 from flask import Flask, jsonify
 
 
@@ -17,7 +17,7 @@ def health_check():
 
 @app.route('/loader', methods=["GET"])
 def loader():
-    es = Elasticsearch()
+    es = Elasticsearch([os.getenv('ES_HOST')])
     with open('Iris.csv') as f:
         reader = csv.DictReader(f)
         helpers.bulk(es, reader, index='iris', doc_type='flowers')
@@ -25,7 +25,7 @@ def loader():
 
 @app.route('/viewer', methods=["GET"])
 def viewer():
-    es = Elasticsearch()
+    es = Elasticsearch([os.getenv('ES_HOST')])
     res = es.search(index="iris", doc_type="flowers", size=1000)
 
     df = pd.json_normalize(res['hits']['hits'])
