@@ -19,7 +19,7 @@ def health_check():
 @app.route('/loader', methods=["GET"])
 def loader():
 
-    es = Elasticsearch()#[os.getenv('ES_HOST')], port= 9200)
+    es = Elasticsearch([os.getenv('ES_HOST')], port= 9200)
     with open('Iris.csv') as f:
         reader = csv.DictReader(f)
         helpers.bulk(es, reader, index='iris', doc_type='flowers')
@@ -27,8 +27,7 @@ def loader():
 
 @app.route('/viewer', methods=["GET"])
 def viewer():
-    # print(os.getenv('ES_HOST'))
-    es = Elasticsearch()#[os.getenv('ES_HOST')], port= 9200)
+    es = Elasticsearch([os.getenv('ES_HOST')], port= 9200)
     res = es.search(index="iris", doc_type="flowers", size=1000)
 
     df = pd.json_normalize(res['hits']['hits'])
@@ -50,4 +49,4 @@ def viewer():
     return render_template('image.html', image = img_path)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8040, debug=True)
+    app.run(host='0.0.0.0', port=8010, debug=True)
