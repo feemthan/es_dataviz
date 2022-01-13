@@ -4,10 +4,11 @@ import requests
 import json
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
 import os
-from flask import Flask, jsonify
-
+import seaborn as sns
+from flask import Flask, jsonify, render_template
+import pdb
+plt.ioff()
 
 app = Flask(__name__)
 
@@ -18,7 +19,7 @@ def health_check():
 @app.route('/loader', methods=["GET"])
 def loader():
 
-    es = Elasticsearch([os.getenv('ES_HOST')], port= 9200)
+    es = Elasticsearch()#[os.getenv('ES_HOST')], port= 9200)
     with open('Iris.csv') as f:
         reader = csv.DictReader(f)
         helpers.bulk(es, reader, index='iris', doc_type='flowers')
@@ -26,8 +27,8 @@ def loader():
 
 @app.route('/viewer', methods=["GET"])
 def viewer():
-
-    es = Elasticsearch([os.getenv('ES_HOST')], port= 9200)
+    # print(os.getenv('ES_HOST'))
+    es = Elasticsearch()#[os.getenv('ES_HOST')], port= 9200)
     res = es.search(index="iris", doc_type="flowers", size=1000)
 
     df = pd.json_normalize(res['hits']['hits'])
@@ -39,10 +40,14 @@ def viewer():
             '_source.PetalWidthCm':'PetalWidthCm', 
             '_source.Species': 'Species'}, inplace=True)
 
+    df = df[['Id', 'SepalLengthCm', 'PetalLengthCm', 'PetalWidthCm', 'Species']]
 
-    g = sns.pairplot(df,hue="Species")
-    plt.show()
-    return jsonify(status='VIEWER WORKS'), 200
+    sns.FacetGrid(df, hue ="Species", height = 6).map(plt.scatter, 'SepalLengthCm', 'PetalLengthCm').add_legend()
+    img_path = os.path.join('static', 'image.png')
+    plt.savefig(img_path)
+    plt.close()
+
+    return render_template('image.html', image = img_path)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8010, debug=True)
+    app.run(host='0.0.0.0', port=8040, debug=True)
